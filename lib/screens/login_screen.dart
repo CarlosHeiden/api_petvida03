@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Login realizado com sucesso!'),
-            backgroundColor: Colors.green,
+            backgroundColor: Color.fromRGBO(76, 175, 80, 1),
           ),
         );
 
@@ -87,11 +87,17 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Login PetVida'), centerTitle: true),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Logo PetVida
+            Image.asset(
+              'assets/images/logo_petvida.jpg',
+              height: 120,
+            ),
+            const SizedBox(height: 32.0), // Espaçamento entre logo e campos
             TextField(
               controller: _usernameController,
               decoration: const InputDecoration(

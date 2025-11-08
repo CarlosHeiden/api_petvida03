@@ -35,5 +35,5 @@ flutter:
   # 🖼️ Ative caso use imagens, ícones ou PDF em assets
   assets:
     - assets/
-    - assets/images/
+    - assets/images/logo_petvida.jpg
     - assets/icons/
