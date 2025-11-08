@@ -1,0 +1,39 @@
+name: api_petvida03
+description: "App PetVida — Sistema de Agendamento e Notificações"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 📦 Dependências principais
+  http: ^1.2.2
+  dio: ^5.7.0
+  logger: ^2.6.2
+  shared_preferences: ^2.3.2
+  cupertino_icons: ^1.0.8
+
+  # 🔥 Firebase
+  firebase_core: ^3.6.0
+  firebase_messaging: ^15.1.2
+  flutter_local_notifications: ^17.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  # 🖼️ Ative caso use imagens, ícones ou PDF em assets
+  assets:
+    - assets/
+    - assets/images/
+    - assets/icons/
