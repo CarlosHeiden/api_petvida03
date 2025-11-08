@@ -17,18 +17,15 @@ class _OneClickAgendamentoScreenState extends State<OneClickAgendamentoScreen> {
   final ApiService _apiService = ApiService();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // Variáveis para o estado
   DateTime? _dataSelecionada;
   int? _servicoSelecionado;
   int? _animalSelecionado;
   List<String> _horariosDisponiveis = [];
   bool _isLoading = false;
 
-  // Futures para buscar os dados dos animais e serviços
   late Future<List<Animal>> _animaisFuture;
   late Future<List<Servicos>> _servicosFuture;
-  
-  
+
   @override
   void initState() {
     super.initState();
@@ -36,10 +33,9 @@ class _OneClickAgendamentoScreenState extends State<OneClickAgendamentoScreen> {
     _servicosFuture = _apiService.getServicos();
   }
 
-  // Função para buscar e atualizar os horários
   Future<void> _fetchHorarios() async {
     if (_dataSelecionada == null || _servicoSelecionado == null) return;
-    
+
     setState(() {
       _isLoading = true;
       _horariosDisponiveis = [];
@@ -65,7 +61,6 @@ class _OneClickAgendamentoScreenState extends State<OneClickAgendamentoScreen> {
     }
   }
 
-  // Função para lidar com o agendamento com um clique
   void _agendar(String horario) async {
     if (_animalSelecionado == null || _servicoSelecionado == null || _dataSelecionada == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -76,16 +71,17 @@ class _OneClickAgendamentoScreenState extends State<OneClickAgendamentoScreen> {
 
     try {
       final dataStr = _dataSelecionada!.toIso8601String().split('T')[0];
-      await ApiService().agendarComUmClique(
-        idAnimal: _animalSelecionado!, // Corrigido: usa a variável de estado
-        idServicos: _servicoSelecionado!, // Corrigido: usa a variável de estado
+      await _apiService.agendarComUmClique(
+        idAnimal: _animalSelecionado!,
+        idServicos: _servicoSelecionado!,
         data: dataStr,
-        hora: horario, // Corrigido: usa o parâmetro recebido
+        hora: horario,
       );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Agendamento realizado com sucesso!')),
       );
-      Navigator.of(context).pop();
+      // Retorna true para HomeScreen recarregar lista
+      if (mounted) Navigator.of(context).pop(true);
     } on DioException catch (e) {
       String errorMessage = 'Erro ao agendar.';
       if (e.response?.statusCode == 400 && e.response!.data is Map) {
@@ -165,9 +161,7 @@ class _OneClickAgendamentoScreenState extends State<OneClickAgendamentoScreen> {
                     onChanged: (newValue) {
                       setState(() {
                         _servicoSelecionado = newValue;
-                        if (_dataSelecionada != null) {
-                          _fetchHorarios();
-                        }
+                        if (_dataSelecionada != null) _fetchHorarios();
                       });
                     },
                   );

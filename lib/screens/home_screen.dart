@@ -1,5 +1,3 @@
-// lib/screens/home_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:api_petvida03/models/agendamento.dart';
 import 'package:api_petvida03/services/api_service.dart';
@@ -17,8 +15,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final ApiService _apiService = ApiService();
   late Future<List<Agendamento>> _agendamentosFuture;
 
-  // Cor padrão do PetVida (Verde Água)
-  // Cor usada no seu template Django: #03bb85. Vamos usá-la aqui.
   static const Color _petVidaGreen = Color(0xFF03bb85);
 
   @override
@@ -37,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Função para recarregar a lista de agendamentos
+  // Recarrega lista de agendamentos
   void _recarregarAgendamentos() {
     setState(() {
       _agendamentosFuture = _apiService.getAgendamentos();
@@ -48,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meus Agendamentos'),
+        title: const Text('Agenda'),
         actions: [
           IconButton(
             icon: const Icon(Icons.access_time),
@@ -59,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ).then((value) {
                 if (value == true) {
-                  _recarregarAgendamentos();
+                  _recarregarAgendamentos(); // Atualiza após novo agendamento
                 }
               });
             },
@@ -88,50 +84,52 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           } else {
-            return RefreshIndicator( // Adiciona funcionalidade Pull-to-refresh
+            return RefreshIndicator(
               onRefresh: () async {
                 _recarregarAgendamentos();
-                await _agendamentosFuture; // Aguarda a recarga
+                await _agendamentosFuture;
               },
               child: ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   final agendamento = snapshot.data![index];
-                  
-                  // LÓGICA DE COR CONDICIONAL
-                  final bool isFinalizado = agendamento.status?.toLowerCase() == 'finalizado';
-                  
-                  final Color cardColor = isFinalizado 
-                      ? Colors.grey.shade300 // Cinza Cimento (Tom leve)
-                      : _petVidaGreen; // Verde Água Padrão
 
-                  final Color textColor = isFinalizado 
-                      ? Colors.black87 // Texto escuro em fundo claro
-                      : Colors.white; // Texto claro em fundo escuro
+                  final bool isFinalizado =
+                      agendamento.status?.toLowerCase() == 'finalizado';
+
+                  final Color cardColor =
+                      isFinalizado ? Colors.grey.shade300 : _petVidaGreen;
+                  final Color textColor =
+                      isFinalizado ? Colors.black87 : Colors.white;
 
                   return Card(
-                    // APLICA A COR CONDICIONAL
-                    color: cardColor, 
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
+                    color: cardColor,
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: ListTile(
                       leading: Icon(Icons.pets, color: textColor),
                       title: Text(
                         agendamento.nomeServico ?? 'Serviço Desconhecido',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: textColor),
                       ),
-                      subtitle: Text(
-                        '${agendamento.nomeAnimal} - '
-                        '${agendamento.dataAgendamento.day}/${agendamento.dataAgendamento.month} às ${agendamento.horaAgendamento}',
-                        // ignore: deprecated_member_use
-                        style: TextStyle(color: textColor.withOpacity(0.8)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${agendamento.nomeAnimal} - ${agendamento.dataAgendamento.day}/${agendamento.dataAgendamento.month} às ${agendamento.horaAgendamento}',
+                            style: TextStyle(color: textColor.withOpacity(0.8)),
+                          ),
+                          if (isFinalizado)
+                            Text(
+                              '✅ Serviço finalizado',
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                        ],
                       ),
-                      // Opcional: Adicionar um ícone de "Concluído"
-                      trailing: isFinalizado
-                          ? Icon(Icons.check_circle, color: textColor)
-                          : null,
+                      trailing:
+                          isFinalizado ? Icon(Icons.check_circle, color: textColor) : null,
                     ),
                   );
                 },
@@ -140,7 +138,6 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
       ),
-      // ... FloatingActionButton e outros widgets
     );
   }
 }
