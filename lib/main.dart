@@ -1,27 +1,17 @@
-// lib/main.dart
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:api_petvida03/screens/login_screen.dart';
-import 'package:api_petvida03/screens/home_screen.dart';
-import 'package:api_petvida03/services/fcm_service.dart'; // 👈 adicionamos aqui
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    await Firebase.initializeApp();
-    print("✅ Firebase inicializado com sucesso!");
-  } catch (e) {
-    print("❌ Erro na inicialização do Firebase: $e");
-  }
-
+  await Firebase.initializeApp(); // Inicializa o Firebase antes de rodar o app
   runApp(const PetVidaApp());
 }
 
 class PetVidaApp extends StatelessWidget {
   const PetVidaApp({super.key});
+
+  static const Color _petVidaGreen = Color.fromARGB(255, 3, 187, 133);
 
   @override
   Widget build(BuildContext context) {
@@ -29,55 +19,45 @@ class PetVidaApp extends StatelessWidget {
       title: 'PetVida',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        primaryColor: _petVidaGreen,
+        colorScheme: ColorScheme.fromSeed(seedColor: _petVidaGreen),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _petVidaGreen,
+            foregroundColor: Colors.white,
+            minimumSize: const Size.fromHeight(50),
+            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: _petVidaGreen,
+            textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: _petVidaGreen,
+            side: BorderSide(color: _petVidaGreen, width: 2),
+            textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: _petVidaGreen, width: 2.0),
+          ),
+          labelStyle: TextStyle(color: _petVidaGreen),
+          prefixIconColor: _petVidaGreen,
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: _petVidaGreen,
+          centerTitle: true,
+        ),
       ),
-      home: const AuthWrapper(),
-    );
-  }
-}
-
-class AuthWrapper extends StatefulWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  State<AuthWrapper> createState() => _AuthWrapperState();
-}
-
-class _AuthWrapperState extends State<AuthWrapper> {
-  Future<bool> _checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
-
-    if (token != null) {
-      print("🔐 Usuário autenticado. Token: $token");
-
-      // 🔔 Inicializa o serviço FCM com o token do usuário logado
-      await FCMService.initializeFCM(authToken: token);
-      return true;
-    } else {
-      print("🚪 Nenhum token de autenticação encontrado.");
-      return false;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: _checkLoginStatus(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        } else {
-          if (snapshot.data == true) {
-            return const HomeScreen();
-          } else {
-            return const LoginScreen();
-          }
-        }
-      },
+      home: const LoginScreen(),
     );
   }
 }
